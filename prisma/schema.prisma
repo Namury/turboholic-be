@@ -12,20 +12,45 @@ datasource db {
 
 model User {
   id        Int             @unique @default(autoincrement())
+  // name
+  // email
+  // phone
+  // password
 }
 
 model Vehicle {
   id        Int             @unique @default(autoincrement())
+  // userId
+  // licensePlate
+  // brand
+  // machineType
+  // fuelType
+  // maxFuelCapacity
+  // maxFuelGauge
+  // initialFuelGauge
+  // initialOdometer
 }
 
 model FuelType {
   id        Int             @unique @default(autoincrement())
+  // name
+  // price
 }
 
 model FuelUpdate {
   id        Int             @unique @default(autoincrement())
+  // userId
+  // vehicleId
+  // fuelTypeId
+  // fuelGaugeBefore
+  // fuelGaugeAfter
+  // refuelAmount
+  // refuelDate
+  // currentOdometer
+
 }
 
 model ServiceUpdate {
   id        Int             @unique @default(autoincrement())
+  // date
 }

@@ -1,34 +1,19 @@
 import { prisma } from "$utils/prisma.utils";
+import { UserRegister, UserResponse, UserToken } from "$utils/user.utils";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-interface RegisterUserObject {
-  username: string;
-  email: string;
-  name: string;
-  password: string;
-}
 
-function createToken(user: any) {
+
+function createToken(user: UserToken) {
   const token = jwt.sign(
-    { id: user.id, email: user.email, schoolId: user.schoolId },
+    { id: user.id, email: user.email },
     process.env.JWT_SECRET_TOKEN?.toString() || "",
     {
       expiresIn: "24h",
     }
   );
   return token;
-}
-
-interface UserResponseObject {
-  token: string;
-  name: string;
-  role: string;
-  email: string;
-  schoolId: number;
-}
-interface GuruResponseObject extends UserResponseObject {
-  nip: string;
 }
 
 export async function userLoginService(
@@ -42,12 +27,10 @@ export async function userLoginService(
     });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = createToken(user);
-      const userDetails: UserResponseObject = {
+      const userDetails: UserResponse = {
         token: token,
         name: user.name,
-        role: user.role,
         email: user.email,
-        schoolId: user.schoolId,
       };
 
       if (user.role == "ADMIN") {
@@ -68,7 +51,7 @@ export async function userLoginService(
 }
 
 export async function userRegisterSekolahService(
-  user: RegisterUserObject
+  user: UserRegister
 ): Promise<any> {
   try {
     const selectedUserField = {
@@ -98,7 +81,7 @@ export async function userRegisterSekolahService(
     const token = createToken(createdUser);
 
     return { status: true, user: createdUser, school: createdSchool, token };
-  } catch (err: any) {
+  } catch (err: unknown) {
     return { status: false, error: { message: "Register Failed" } };
   }
 }
