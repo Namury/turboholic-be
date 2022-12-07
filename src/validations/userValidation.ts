@@ -21,7 +21,7 @@ export function validateLoginRequest(
   next();
 }
 
-export function validateRegisterSekolahRequest(
+export function validateRegisterRequest(
   req: Request,
   res: Response,
   next: NextFunction

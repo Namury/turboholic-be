@@ -11,46 +11,74 @@ datasource db {
 }
 
 model User {
-  id        Int             @unique @default(autoincrement())
-  // name
-  // email
-  // phone
-  // password
+  id        Int         @unique @default(autoincrement())
+  name      String
+  username  String      @unique
+  email     String      @unique
+  phone     String      @unique
+  password  String
+  createdAt DateTime    @default(now())
+
+  Vehicle Vehicle[]
+  FuelUpdate    FuelUpdate[]
 }
 
 model Vehicle {
-  id        Int             @unique @default(autoincrement())
-  // userId
-  // licensePlate
-  // brand
-  // machineType
-  // fuelType
-  // maxFuelCapacity
-  // maxFuelGauge
-  // initialFuelGauge
-  // initialOdometer
+  id                Int         @unique @default(autoincrement())
+  userId            Int
+  User              User        @relation(fields: [userId], references: [id])
+  licensePlate      String
+  brand             String
+  engineTypeId      Int
+  EngineType        EngineType  @relation(fields: [engineTypeId], references: [id])
+  initialFuelTypeId Int
+  FuelType          FuelType    @relation(fields: [initialFuelTypeId], references: [id])
+  maxFuelCapacity   String
+  maxFuelGauge      String
+  initialFuelGauge  String
+  initialOdometer   String
+  createdAt         DateTime    @default(now())
+
+  FuelUpdate    FuelUpdate[]
 }
 
 model FuelType {
-  id        Int             @unique @default(autoincrement())
-  // name
-  // price
+  id          Int              @unique @default(autoincrement())
+  name        String
+  price       Int
+  createdAt   DateTime         @default(now())
+
+  FuelUpdate  FuelUpdate[]
+  Vehicle     Vehicle[]
+}
+
+
+model EngineType {
+  id          Int              @unique @default(autoincrement())
+  name        String
+  price       Int
+  createdAt   DateTime         @default(now())
+
+  Vehicle     Vehicle[]
 }
 
 model FuelUpdate {
-  id        Int             @unique @default(autoincrement())
-  // userId
-  // vehicleId
-  // fuelTypeId
-  // fuelGaugeBefore
-  // fuelGaugeAfter
-  // refuelAmount
-  // refuelDate
-  // currentOdometer
-
+  id                Int       @unique @default(autoincrement())
+  userId            Int
+  User              User      @relation(fields: [userId], references: [id])
+  vehicleId         Int
+  Vehicle           Vehicle   @relation(fields: [vehicleId], references: [id])
+  fuelTypeId        Int
+  FuelType          FuelType  @relation(fields: [fuelTypeId], references: [id])
+  fuelGaugeBefore   String
+  fuelGaugeAfter    String
+  refuelAmount      String
+  refuelDate        String
+  currentOdometer   String
+  createdAt         DateTime  @default(now())
 }
 
 model ServiceUpdate {
   id        Int             @unique @default(autoincrement())
-  // date
+  date      DateTime
 }

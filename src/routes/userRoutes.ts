@@ -1,20 +1,20 @@
 import {
     login,
-    registerSekolah
+    register
   } from "$controllers/userController";
   import express from "express";
   import {
     validateLoginRequest,
-    validateRegisterSekolahRequest
+    validateRegisterRequest
   } from "$validations/userValidation";
   
   const userRoutes = express.Router();
   
   userRoutes.post("/login", validateLoginRequest, login);
   userRoutes.post(
-    "/register/sekolah",
-    validateRegisterSekolahRequest,
-    registerSekolah
+    "/register",
+    validateRegisterRequest,
+    register
   );
 
   export default userRoutes;

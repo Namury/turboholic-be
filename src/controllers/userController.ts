@@ -1,38 +1,41 @@
 import {
   userLoginService,
-  userRegisterSekolahService,
+  userRegisterService,
 } from "$services/userServices";
 import {
   response_internal_server_error,
   response_success,
   response_unauthorized,
 } from "$utils/response.utils";
+import { UserRegister } from "$utils/user.utils";
 import { Request, Response } from "express";
 
 export async function login(req: Request, res: Response): Promise<Response> {
   try {
-    const { email, password, error } = req.body;
-    const { status, userDetails } = await userLoginService(email, password);
+    const { email, password,  } = req.body;
+    const { status, data, error } = await userLoginService(email, password);
     if (status) {
-      return response_success(res, userDetails);
+      return response_success(res, data);
     } else {
       return response_unauthorized(res, error);
     }
-  } catch (err: any) {
-    return response_internal_server_error(res, err.message);
+  } catch (err: unknown) {
+    return response_internal_server_error(res, String(err));
   }
 }
 
-export async function registerSekolah(req: Request, res: Response) {
+export async function register(req: Request, res: Response) {
   try {
-    const { user, status, token, error, school } =
-      await userRegisterSekolahService(req.body);
+    const userData:UserRegister = req.body
+  
+    const { status, data, error } = await userRegisterService(userData);
     if (status) {
-      return response_success(res, { user, token, school });
+      return response_success(res, data);
     } else {
-      throw new Error(error);
+      return response_unauthorized(res, error);
     }
-  } catch (err: any) {
-    return response_internal_server_error(res, err.message);
+
+  } catch (err: unknown) {
+    return response_internal_server_error(res, String(err));
   }
 }

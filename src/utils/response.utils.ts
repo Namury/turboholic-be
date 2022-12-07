@@ -154,3 +154,21 @@ export const response_created = (
 ): Response => {
 	return response_handler(res, 201, content, message, undefined);
 };
+
+export const response_to_controller = (
+	status: boolean,
+	message: string,
+	data: object,
+	error?: string
+): response => {
+	return {
+		status, message, data, error
+	}
+}
+
+export interface response {
+    status: boolean,
+	message: string,
+	data: object,
+	error?: string
+}

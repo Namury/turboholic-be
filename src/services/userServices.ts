@@ -3,7 +3,7 @@ import { UserRegister, UserResponse, UserToken } from "$utils/user.utils";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
-
+import { response } from "$utils/response.utils";
 
 function createToken(user: UserToken) {
   const token = jwt.sign(
@@ -17,13 +17,21 @@ function createToken(user: UserToken) {
 }
 
 export async function userLoginService(
-  email: string,
-  password: string
-): Promise<any> {
+  username: string,
+  password: string,
+): Promise<response> {
   try {
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    let condition:object
+
+    condition = {username: username}
+    if (!re.test(username)) {
+        condition = {email: username}
+    }
+
     const user = await prisma.user.findUnique({
-      where: { email: email },
-      include: { profile: true },
+      where: condition,
+      include: { Vehicle: true },
     });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = createToken(user);
@@ -33,55 +41,44 @@ export async function userLoginService(
         email: user.email,
       };
 
-      if (user.role == "ADMIN") {
-        return { status: true, userDetails };
-      } else {
-        const teacherDetails: GuruResponseObject = {
-          ...userDetails,
-          nip: user.profile?.NIP || "",
-        };
-        return { status: true, userDetails: teacherDetails };
+      return {
+        status: true,
+        message: "Login Success",
+        data: userDetails
       }
     } else {
       throw new Error("Incorrect");
+
     }
-  } catch (err: any) {
-    return { status: false, error: "Unauthorized" };
+  } catch (err: unknown) {
+    return { 
+      status: false, 
+      message: "Login Failed",
+      data: {},
+      error: "Unauthorized" };
   }
 }
 
-export async function userRegisterSekolahService(
-  user: UserRegister
-): Promise<any> {
+export async function userRegisterService(user: UserRegister): Promise<response> {
   try {
     const selectedUserField = {
       id: true,
       email: true,
+      username: true,
       name: true,
-      schoolId: true,
     };
-
-    const selectedSchoolField = { id: true, name: true };
-    const createdSchool = await prisma.school.create({
-      data: {
-        name: user.name,
-      },
-      select: selectedSchoolField,
-    });
     user.password = await bcrypt.hash(user.password, 12);
 
     const createdUser = await prisma.user.create({
       data: {
         ...user,
-        role: "ADMIN",
-        schoolId: createdSchool.id,
       },
       select: selectedUserField,
     });
     const token = createToken(createdUser);
 
-    return { status: true, user: createdUser, school: createdSchool, token };
+    return { status: true, data: { user: createdUser, token}, message: "Register Success"  };
   } catch (err: unknown) {
-    return { status: false, error: { message: "Register Failed" } };
+    return { status: false, data: {}, message: "Register Failed", error: String(err) };
   }
 }
