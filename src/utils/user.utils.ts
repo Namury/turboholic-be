@@ -4,7 +4,6 @@ export interface UserToken{
 }
 
 export interface UserRegister {
-    username: string;
     email: string;
     phone: string;
     name: string;

@@ -18,3 +18,17 @@ export async function addVehicleService(vehicle: VehicleRegister): Promise<respo
   }
 }
 
+export async function getVehicleService(userId:number): Promise<response> {
+  try {
+    const vehicles = await prisma.vehicle.findMany({
+      where:{
+        userId
+      }
+    })
+
+    return { status: true, data: { vehicles }, message: "Get Vehicle Success"  };
+  } catch (err: unknown) {
+    return { status: false, data: {}, message: "Get Vehicle Failed", error: String(err) };
+  }
+}
+

@@ -12,8 +12,8 @@ import { Request, Response } from "express";
 
 export async function login(req: Request, res: Response): Promise<Response> {
   try {
-    const { email, password,  } = req.body;
-    const { status, data, error } = await userLoginService(email, password);
+    const { username, password,  } = req.body;
+    const { status, data, error } = await userLoginService(username, password);
     if (status) {
       return response_success(res, data);
     } else {

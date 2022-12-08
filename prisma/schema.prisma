@@ -13,7 +13,7 @@ datasource db {
 model User {
   id        Int         @unique @default(autoincrement())
   name      String
-  username  String      @unique
+  username  String?      @unique
   email     String      @unique
   phone     String      @unique
   password  String
@@ -33,33 +33,35 @@ model Vehicle {
   EngineType        EngineType  @relation(fields: [engineTypeId], references: [id])
   initialFuelTypeId Int
   FuelType          FuelType    @relation(fields: [initialFuelTypeId], references: [id])
-  maxFuelCapacity   String
-  maxFuelGauge      String
-  initialFuelGauge  String
-  initialOdometer   String
+  maxFuelCapacity   Int
+  maxFuelGauge      Int
+  initialFuelGauge  Int
+  initialOdometer   Int
   createdAt         DateTime    @default(now())
 
   FuelUpdate    FuelUpdate[]
 }
 
 model FuelType {
-  id          Int              @unique @default(autoincrement())
-  name        String
-  price       Int
-  createdAt   DateTime         @default(now())
+  id            Int              @unique @default(autoincrement())
+  engineTypeId  Int
+  EngineType    EngineType  @relation(fields: [engineTypeId], references: [id])
+  name          String
+  price         Int
+  createdAt     DateTime         @default(now())
 
-  FuelUpdate  FuelUpdate[]
-  Vehicle     Vehicle[]
+  FuelUpdate    FuelUpdate[]
+  Vehicle       Vehicle[]
 }
 
 
 model EngineType {
   id          Int              @unique @default(autoincrement())
   name        String
-  price       Int
   createdAt   DateTime         @default(now())
 
   Vehicle     Vehicle[]
+  FuelType    FuelType[]
 }
 
 model FuelUpdate {
@@ -70,11 +72,11 @@ model FuelUpdate {
   Vehicle           Vehicle   @relation(fields: [vehicleId], references: [id])
   fuelTypeId        Int
   FuelType          FuelType  @relation(fields: [fuelTypeId], references: [id])
-  fuelGaugeBefore   String
-  fuelGaugeAfter    String
-  refuelAmount      String
-  refuelDate        String
-  currentOdometer   String
+  fuelGaugeBefore   Int
+  fuelGaugeAfter    Int
+  refuelAmount      Int
+  refuelDate        DateTime
+  currentOdometer   Int
   createdAt         DateTime  @default(now())
 }
 

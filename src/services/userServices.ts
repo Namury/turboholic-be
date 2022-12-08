@@ -24,9 +24,9 @@ export async function userLoginService(
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     let condition:object
 
-    condition = {username: username}
+    condition = {email: username}
     if (!re.test(username)) {
-        condition = {email: username}
+      condition = {username: username}
     }
 
     const user = await prisma.user.findUnique({
@@ -64,7 +64,6 @@ export async function userRegisterService(user: UserRegister): Promise<response>
     const selectedUserField = {
       id: true,
       email: true,
-      username: true,
       name: true,
     };
     user.password = await bcrypt.hash(user.password, 12);
