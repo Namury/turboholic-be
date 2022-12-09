@@ -1,5 +1,4 @@
 import { prisma } from "$utils/prisma.utils";
-import "dotenv/config";
 import { response } from "$utils/response.utils";
 import { VehicleRegister } from "$utils/vehicle.utils";
 
