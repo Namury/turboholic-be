@@ -11,6 +11,9 @@ const allowedOrigins = [
   "http://localhost:" + String(PORT),
   "http://localhost:3000",
   "http://localhost:3001",
+  "http://localhost:3000/",
+  "https://turboholic.vercel.app/",
+  "https://turboholic.vercel.app"
 ];
 
 const options: cors.CorsOptions = {
