@@ -1,15 +1,17 @@
-// import {
-//     addUpdate
-//   } from "$controllers/fuelUpdateController";
-//   import express from "express";
-//   import {
-//     validateAddFuelUpdate
-//   } from "$validations/fuelUpdateValidation";
+import {
+    getFuelUpdate,
+    addFuelUpdate
+} from "$controllers/fuelUpdateController";
+import express from "express";
+import {
+  validateAddFuelUpdate
+} from "$validations/fuelUpdateValidation";
+import { checkJwt } from "$middlewares/authMiddleware";
   
-//   const vehicleRoutes = express.Router();
+  const fuelUpdateRoutes = express.Router();
   
-//   vehicleRoutes.post("/add", validateAddFuelUpdate, addUpdate);
+  fuelUpdateRoutes.get("/", checkJwt, getFuelUpdate);
+  fuelUpdateRoutes.post("/add", checkJwt, validateAddFuelUpdate, addFuelUpdate);
 
-
-//   export default vehicleRoutes;
+  export default fuelUpdateRoutes;
   

@@ -2,6 +2,7 @@ import {
     getFuelUpdateService,
     addFuelUpdateService
   } from "$services/fuelUpdateServuces";
+import { addFuelUpdate } from "$utils/fuelUpdate.utils";
   import {
     response_internal_server_error,
     response_success,
@@ -11,7 +12,14 @@ import {
   
   export async function getFuelUpdate(req: Request, res: Response): Promise<Response> {
     try {
-      const { status, data, error } = await getFuelUpdateService();
+      const vehicleId = Number(req.query.vehicleId)
+      const fuelTypeId = Number(req.query.fuelTypeId)
+      let dateStart
+      let dateEnd
+      if(req.query.dateStart) dateStart = String(req.query.dateStart)
+      if(req.query.dateEnd) dateEnd = String(req.query.dateEnd)
+
+      const { status, data, error } = await getFuelUpdateService(vehicleId, fuelTypeId, dateStart, dateEnd);
       if (status) {
         return response_success(res, data);
       } else {
@@ -24,11 +32,32 @@ import {
   
   export async function addFuelUpdate(req: Request, res: Response) {
     try {
-      const { status, data, error } = await addFuelUpdateService();
+      const {
+        vehicleId,
+        fuelTypeId,
+        fuelGaugeBefore,
+        fuelGaugeAfter,
+        refuelAmount,
+        refuelDate,
+        currentOdometer,
+      } = req.body
+
+      const fuelUpdateData:addFuelUpdate = {
+        userId: Number(res.locals.jwtPayload.id),
+        vehicleId: Number(vehicleId),
+        fuelTypeId: Number(fuelTypeId),
+        fuelGaugeBefore: Number(fuelGaugeBefore),
+        fuelGaugeAfter: Number(fuelGaugeAfter),
+        refuelAmount: Number(refuelAmount),
+        refuelDate: new Date(refuelDate),
+        currentOdometer: Number(currentOdometer),
+      }
+
+      const { status, data, error } = await addFuelUpdateService(fuelUpdateData);
       if (status) {
         return response_success(res, data);
       } else {
-        return response_unauthorized(res, error);
+        return response_internal_server_error(res, error);
       }
   
     } catch (err: unknown) {
