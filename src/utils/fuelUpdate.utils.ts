@@ -1,3 +1,5 @@
+import { FuelUpdate } from "@prisma/client";
+
 export interface addFuelUpdate {
   userId: number;
   vehicleId: number;
@@ -7,6 +9,16 @@ export interface addFuelUpdate {
   refuelAmount: number;
   refuelDate: Date;
   currentOdometer: number;
+}
+
+export interface kmPerLiterCalculation {
+  refuelAmount: number;
+  currentOdometer: number;
+}
+
+export interface chartData{
+  date: string;
+  total: number
 }
 
 export interface dateFilterType {

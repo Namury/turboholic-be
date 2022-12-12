@@ -1,7 +1,7 @@
 import {
     getFuelUpdateService,
     addFuelUpdateService
-  } from "$services/fuelUpdateServuces";
+  } from "$services/fuelUpdateServices";
 import { addFuelUpdate } from "$utils/fuelUpdate.utils";
   import {
     response_internal_server_error,
