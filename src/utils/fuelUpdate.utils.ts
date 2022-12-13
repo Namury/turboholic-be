@@ -1,5 +1,3 @@
-import { FuelUpdate } from "@prisma/client";
-
 export interface addFuelUpdate {
   userId: number;
   vehicleId: number;
@@ -19,6 +17,11 @@ export interface kmPerLiterCalculation {
 export interface chartData{
   date: string;
   total: number
+}
+
+export function round(value:number, precision?:number) {
+  const multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
 }
 
 export interface dateFilterType {

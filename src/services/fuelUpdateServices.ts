@@ -2,6 +2,7 @@ import {
   addFuelUpdate,
   chartData,
   kmPerLiterCalculation,
+  round,
 } from "$utils/fuelUpdate.utils";
 import { prisma } from "$utils/prisma.utils";
 import { response } from "$utils/response.utils";
@@ -60,19 +61,21 @@ function calculateFuelSavings(fuelUpdate: FuelUpdate[], fuelPrice: number) {
   // console.log("Fuel Usage 1", fuelUsage1)
   // console.log("Fuel Usage 2", fuelUsage2)
 
-  const distanceDifference = fuelUsage2.distance - fuelUsage1.distance;
+  const distanceDifference = fuelUsage2.distance;
   const fuelUsageDifference = fuelUsage2.fuelUsage - fuelUsage1.fuelUsage;
 
-  const fuelSavings = distanceDifference * fuelUsageDifference;
+  const fuelSavings = distanceDifference / fuelUsageDifference;
 
   return {
-    fuelSavingsLiter: fuelSavings,
-    fuelSavingRupiah: fuelSavings * fuelPrice,
+    fuelSavingsLiter: round(fuelSavings, 1),
+    fuelSavingRupiah: round(fuelSavings * fuelPrice),
   };
 }
 
 function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
   const chartData: chartData[] = [];
+  let currentFuelUsage;
+  let totalDistance = 0;
   let data1: FuelUpdate;
   let data2: FuelUpdate;
 
@@ -84,16 +87,23 @@ function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
     if (index < fuelUpdate.length && index != 0) {
       data2 = data;
       const total = calculateKmPerLiter(data1, data2);
+      totalDistance += total.distance
+      if(index == fuelUpdate.length-1){
+        currentFuelUsage = total.fuelUsage
+      }
       chartData.push({
-        date: String(data.refuelDate),
-        total: total.fuelUsage,
+        date: String(data.refuelDate.toLocaleString('id-ID', { day: 'numeric', month: 'short',  })),
+        total: round(total.fuelUsage, 1),
       });
-
       data1 = data;
     }
   });
 
-  return chartData;
+  return {
+    currentFuelUsage,
+    totalDistance,
+    chartData
+  };
 }
 
 export async function getFuelUpdateService(
@@ -148,10 +158,15 @@ export async function getFuelUpdateService(
       };
     }
 
+    const fuelUpdateChart = getFuelUpdateChart(fuelUpdate)
+
+
     return {
       status: true,
       data: {
-        chartData: getFuelUpdateChart(fuelUpdate),
+        chartData: fuelUpdateChart.chartData,
+        currentFuelUsage: fuelUpdateChart.currentFuelUsage,
+        totalDistance: fuelUpdateChart.totalDistance,
         fuelSavingsData: calculateFuelSavings(fuelUpdate, fuelType.price),
       },
       message: "Get Fuel Update Success",
