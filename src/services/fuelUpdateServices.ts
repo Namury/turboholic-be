@@ -165,6 +165,7 @@ export async function getFuelUpdateService(
       status: true,
       data: {
         chartData: fuelUpdateChart.chartData,
+        fuelPrice: fuelType.price,
         currentFuelUsage: fuelUpdateChart.currentFuelUsage,
         totalDistance: fuelUpdateChart.totalDistance,
         fuelSavingsData: calculateFuelSavings(fuelUpdate, fuelType.price),
