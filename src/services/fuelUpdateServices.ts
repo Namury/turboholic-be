@@ -1,9 +1,16 @@
-import { addFuelUpdate, chartData, kmPerLiterCalculation } from "$utils/fuelUpdate.utils";
+import {
+  addFuelUpdate,
+  chartData,
+  kmPerLiterCalculation,
+} from "$utils/fuelUpdate.utils";
 import { prisma } from "$utils/prisma.utils";
 import { response } from "$utils/response.utils";
 import { FuelUpdate } from "@prisma/client";
 
- function calculateKmPerLiter(data1:kmPerLiterCalculation, data2:kmPerLiterCalculation) {
+function calculateKmPerLiter(
+  data1: kmPerLiterCalculation,
+  data2: kmPerLiterCalculation
+) {
   /*
     - params: 2 fuelUpdate data
     - Max fuel - Refuel Amount? = fuel usage
@@ -12,62 +19,79 @@ import { FuelUpdate } from "@prisma/client";
     - return {float (km/liter), float distance}
     */
   const distance = data2.currentOdometer - data1.currentOdometer;
-  const fuelUsage = distance / data2.refuelAmount
+  const fuelUsage = distance / data2.refuelAmount;
 
-
-  return{
+  return {
     fuelUsage, //km per liter
-    distance //km
+    distance, //km
   };
 }
-async function calculateFuelSavings() {
-  /*vehicleId:number, fuelTypeId: number
-    - params: vehicleId and fueltypeId
+function calculateFuelSavings(fuelUpdate: FuelUpdate[], fuelPrice: number) {
+  /*
     - get latest fuel update by vehicle and fueltype (get, limit 3, descending)
     - if data is less than 3, return km/liter.
     - calculate Km/liter first second (1) and second third(2)
     - (2) - (1) = Km/liter and distance difference
     - distance difference * km/liter difference = Liter Saved(?)
-    */
+  */
 
-    // const fuelUpdate = await prisma.fuelUpdate.findMany({
-    //   where: {
-    //     vehicleId,
-    //     fuelTypeId,
-    //   }, orderBy:{
-    //     refuelDate: 'asc'
-    //   }, take: 3
-    // });
+  if (fuelUpdate.length < 3) {
+    return null;
+  }
 
-    // fuelUpdate.forEach(function(data, index){
+  const data1 = {
+    refuelAmount: fuelUpdate[fuelUpdate.length - 1].refuelAmount,
+    currentOdometer: fuelUpdate[fuelUpdate.length - 1].currentOdometer,
+  }; //newest
 
-    // })
+  const data2 = {
+    refuelAmount: fuelUpdate[fuelUpdate.length - 2].refuelAmount,
+    currentOdometer: fuelUpdate[fuelUpdate.length - 2].currentOdometer,
+  };
 
-  return 0;
+  const data3 = {
+    refuelAmount: fuelUpdate[fuelUpdate.length - 3].refuelAmount,
+    currentOdometer: fuelUpdate[fuelUpdate.length - 3].currentOdometer,
+  }; //oldest
+
+  const fuelUsage1 = calculateKmPerLiter(data2, data1);
+  const fuelUsage2 = calculateKmPerLiter(data3, data2);
+
+  // console.log("Fuel Usage 1", fuelUsage1)
+  // console.log("Fuel Usage 2", fuelUsage2)
+
+  const distanceDifference = fuelUsage2.distance - fuelUsage1.distance;
+  const fuelUsageDifference = fuelUsage2.fuelUsage - fuelUsage1.fuelUsage;
+
+  const fuelSavings = distanceDifference * fuelUsageDifference;
+
+  return {
+    fuelSavingsLiter: fuelSavings,
+    fuelSavingRupiah: fuelSavings * fuelPrice,
+  };
 }
 
-async function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
-  const chartData:chartData[] = []
-  let data1:FuelUpdate
-  let data2:FuelUpdate
+function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
+  const chartData: chartData[] = [];
+  let data1: FuelUpdate;
+  let data2: FuelUpdate;
 
-  fuelUpdate.forEach(function(data, index){
-    if(index == 0){
-      data1 = data
+  fuelUpdate.forEach(function (data, index) {
+    if (index == 0) {
+      data1 = data;
     }
 
-    if(index < fuelUpdate.length && index != 0){
-      data2 = data
-      const total = calculateKmPerLiter(data1,data2)
+    if (index < fuelUpdate.length && index != 0) {
+      data2 = data;
+      const total = calculateKmPerLiter(data1, data2);
       chartData.push({
         date: String(data.refuelDate),
-        total: total.fuelUsage
-      })
-      
-      data1 = data
-    }
+        total: total.fuelUsage,
+      });
 
-  })
+      data1 = data;
+    }
+  });
 
   return chartData;
 }
@@ -103,19 +127,33 @@ export async function getFuelUpdateService(
         vehicleId,
         fuelTypeId,
         refuelDate: dateFilter,
-      }, orderBy:{
-        refuelDate: 'asc'
-      }
+      },
+      orderBy: {
+        refuelDate: "asc",
+      },
     });
 
-    await getFuelUpdateChart(fuelUpdate);
+    const fuelType = await prisma.fuelType.findUnique({
+      where: {
+        id: fuelTypeId,
+      },
+    });
 
-    calculateKmPerLiter;
-    calculateFuelSavings();
+    if (!fuelType) {
+      return {
+        status: false,
+        data: { fuelUpdate },
+        message: "fuelType is Invalid",
+        error: "",
+      };
+    }
 
     return {
       status: true,
-      data: { fuelUpdate },
+      data: {
+        chartData: getFuelUpdateChart(fuelUpdate),
+        fuelSavingsData: calculateFuelSavings(fuelUpdate, fuelType.price),
+      },
       message: "Get Fuel Update Success",
     };
   } catch (err: unknown) {
