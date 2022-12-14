@@ -39,6 +39,10 @@ export async function validateAddFuelUpdate(
     return response_bad_request(res, "Vehicle ID not found");
   }
 
+  if(new Date(refuelDate) < currentVehicle.createdAt){
+    return response_bad_request(res, "Refuel Date is invalid");
+  }
+
   if (refuelAmount > currentVehicle.maxFuelCapacity)
     return response_bad_request(res, "Refuel Amount is invalid");
 

@@ -58,11 +58,14 @@ function calculateFuelSavings(fuelUpdate: FuelUpdate[], fuelPrice: number) {
   const fuelUsage1 = calculateKmPerLiter(data2, data1);
   const fuelUsage2 = calculateKmPerLiter(data3, data2);
 
+  // console.log("Fuel Usagee 1", fuelUpdate[fuelUpdate.length - 1])
+  // console.log("Fuel Usagee 2", fuelUpdate[fuelUpdate.length - 2])
+  // console.log("Fuel Usagee 3", fuelUpdate[fuelUpdate.length - 3])
   // console.log("Fuel Usage 1", fuelUsage1)
   // console.log("Fuel Usage 2", fuelUsage2)
 
   const distanceDifference = fuelUsage2.distance;
-  const fuelUsageDifference = fuelUsage2.fuelUsage - fuelUsage1.fuelUsage;
+  const fuelUsageDifference = fuelUsage1.fuelUsage - fuelUsage2.fuelUsage;
 
   const fuelSavings = distanceDifference / fuelUsageDifference;
 
@@ -87,12 +90,17 @@ function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
     if (index < fuelUpdate.length && index != 0) {
       data2 = data;
       const total = calculateKmPerLiter(data1, data2);
-      totalDistance += total.distance
-      if(index == fuelUpdate.length-1){
-        currentFuelUsage = total.fuelUsage
+      totalDistance += total.distance;
+      if (index == fuelUpdate.length - 1) {
+        currentFuelUsage = total.fuelUsage;
       }
       chartData.push({
-        date: String(data.refuelDate.toLocaleString('id-ID', { day: 'numeric', month: 'short',  })),
+        date: String(
+          data.refuelDate.toLocaleString("id-ID", {
+            day: "numeric",
+            month: "short",
+          })
+        ),
         total: round(total.fuelUsage, 1),
       });
       data1 = data;
@@ -102,7 +110,7 @@ function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
   return {
     currentFuelUsage,
     totalDistance,
-    chartData
+    chartData,
   };
 }
 
@@ -158,8 +166,7 @@ export async function getFuelUpdateService(
       };
     }
 
-    const fuelUpdateChart = getFuelUpdateChart(fuelUpdate)
-
+    const fuelUpdateChart = getFuelUpdateChart(fuelUpdate);
 
     return {
       status: true,
