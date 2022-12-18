@@ -39,8 +39,21 @@ export async function validateAddFuelUpdate(
     return response_bad_request(res, "Vehicle ID not found");
   }
 
-  if(new Date(refuelDate) < currentVehicle.createdAt){
-    return response_bad_request(res, "Refuel Date is invalid");
+  const currentFuelUpdate = await prisma.fuelUpdate.findFirst({
+    where: {
+      vehicleId: currentVehicle.id,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  if (new Date(refuelDate) < currentVehicle.createdAt) {
+    return response_bad_request(res, "Refuel Date is older than initial data");
+  }
+
+  if (currentFuelUpdate && new Date(refuelDate) < currentFuelUpdate.createdAt) {
+    return response_bad_request(res, "Refuel Date is older than latest fuel update");
   }
 
   if (refuelAmount > currentVehicle.maxFuelCapacity)

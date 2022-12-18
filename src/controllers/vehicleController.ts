@@ -12,7 +12,6 @@ import { Request, Response } from "express";
   
   export async function getVehicle(req: Request, res: Response) {
     try {
-      console.log(res.locals.jwtPayload)
       const userId = res.locals.jwtPayload.id
     
       const { status, data, error } = await getVehicleService(userId);
@@ -29,7 +28,6 @@ import { Request, Response } from "express";
 
   export async function addVehicle(req: Request, res: Response) {
     try {
-      console.log(res.locals.jwtPayload)
       const {
         licensePlate,
         brand,
@@ -52,7 +50,6 @@ import { Request, Response } from "express";
         initialFuelGauge: Number(initialFuelGauge),
         initialOdometer: Number(initialOdometer),
       }
-      console.log(vehicleData)
     
       const { status, data, error } = await addVehicleService(vehicleData);
       if (status) {

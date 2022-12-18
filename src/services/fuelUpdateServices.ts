@@ -2,6 +2,7 @@ import {
   addFuelUpdate,
   chartData,
   kmPerLiterCalculation,
+  summaryData,
   round,
 } from "$utils/fuelUpdate.utils";
 import { prisma } from "$utils/prisma.utils";
@@ -177,6 +178,97 @@ export async function getFuelUpdateService(
         totalDistance: fuelUpdateChart.totalDistance,
         fuelSavingsData: calculateFuelSavings(fuelUpdate, fuelType.price),
       },
+      message: "Get Fuel Update Success",
+    };
+  } catch (err: unknown) {
+    return {
+      status: false,
+      data: {},
+      message: "Get Fuel Update Failed",
+      error: String(err),
+    };
+  }
+}
+
+export async function getFuelUpdateSummaryService(
+  vehicleId: number,
+  dateStart?: string,
+  dateEnd?: string
+): Promise<response> {
+  try {
+    /*
+    - get fuel type by engine id
+    - foreach fuel type = get fuel saving
+    */
+
+    const dateFilter: Record<string, unknown> = {};
+
+    if (dateStart) {
+      dateFilter.gte = new Date(dateStart);
+    }
+
+    if (dateEnd) {
+      dateFilter.lte = new Date(dateEnd);
+    }
+
+    const currentVehicle = await prisma.vehicle.findUnique({
+      where: {
+        id: vehicleId,
+      },
+    });
+
+    if (!currentVehicle) {
+      return {
+        status: false,
+        data: { vehicleId },
+        message: "vehicleID is Invalid",
+        error: "",
+      };
+    }
+
+    const fuelType = await prisma.fuelType.findMany({
+      where: {
+        engineTypeId: currentVehicle.engineTypeId,
+      },
+    });
+
+    if (!fuelType) {
+      return {
+        status: false,
+        data: { currentVehicle },
+        message: "fuelType is Invalid",
+        error: "",
+      };
+    }
+
+    const returnData:summaryData[] = [];
+
+    fuelType.forEach(async function (data) {
+      const fuelUpdate = await prisma.fuelUpdate.findMany({
+        where: {
+          vehicleId,
+          fuelTypeId: data.id,
+          refuelDate: dateFilter,
+        },
+        orderBy: {
+          refuelDate: "asc",
+        },
+        take: 3,
+      });
+      const fuelSavings = calculateFuelSavings(fuelUpdate, data.price)
+      
+      returnData.push({
+        fuelType: data.name,
+        fuelPrice: data.price,
+        fuelSavingRupiah: fuelSavings?.fuelSavingRupiah,
+        fuelSavingsLiter: fuelSavings?.fuelSavingsLiter,
+      })
+    });
+
+
+    return {
+      status: true,
+      data: returnData,
       message: "Get Fuel Update Success",
     };
   } catch (err: unknown) {

@@ -1,6 +1,7 @@
 import {
     getFuelUpdateService,
-    addFuelUpdateService
+    addFuelUpdateService,
+    getFuelUpdateSummaryService
   } from "$services/fuelUpdateServices";
 import { addFuelUpdate } from "$utils/fuelUpdate.utils";
   import {
@@ -20,6 +21,25 @@ import { addFuelUpdate } from "$utils/fuelUpdate.utils";
       if(req.query.dateEnd) dateEnd = String(req.query.dateEnd)
 
       const { status, data, error } = await getFuelUpdateService(vehicleId, fuelTypeId, dateStart, dateEnd);
+      if (status) {
+        return response_success(res, data);
+      } else {
+        return response_unauthorized(res, error);
+      }
+    } catch (err: unknown) {
+      return response_internal_server_error(res, String(err));
+    }
+  }
+
+  export async function getFuelUpdateSummary(req: Request, res: Response): Promise<Response> {
+    try {
+      const vehicleId = Number(req.query.vehicleId)
+      let dateStart
+      let dateEnd
+      if(req.query.dateStart) dateStart = String(req.query.dateStart)
+      if(req.query.dateEnd) dateEnd = String(req.query.dateEnd)
+
+      const { status, data, error } = await getFuelUpdateSummaryService(vehicleId, dateStart, dateEnd);
       if (status) {
         return response_success(res, data);
       } else {

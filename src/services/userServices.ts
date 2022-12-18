@@ -18,15 +18,16 @@ function createToken(user: UserToken) {
 
 export async function userLoginService(
   username: string,
-  password: string,
+  password: string
 ): Promise<response> {
   try {
-    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    let condition:object
+    const re =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    let condition: object;
 
-    condition = {email: username}
+    condition = { email: username };
     if (!re.test(username)) {
-      condition = {username: username}
+      condition = { username: username };
     }
 
     const user = await prisma.user.findUnique({
@@ -44,22 +45,24 @@ export async function userLoginService(
       return {
         status: true,
         message: "Login Success",
-        data: userDetails
-      }
+        data: userDetails,
+      };
     } else {
       throw new Error("Incorrect");
-
     }
   } catch (err: unknown) {
-    return { 
-      status: false, 
+    return {
+      status: false,
       message: "Login Failed",
       data: {},
-      error: "Unauthorized" };
+      error: String(err),
+    };
   }
 }
 
-export async function userRegisterService(user: UserRegister): Promise<response> {
+export async function userRegisterService(
+  user: UserRegister
+): Promise<response> {
   try {
     const selectedUserField = {
       id: true,
@@ -76,8 +79,17 @@ export async function userRegisterService(user: UserRegister): Promise<response>
     });
     const token = createToken(createdUser);
 
-    return { status: true, data: { user: createdUser, token}, message: "Register Success"  };
+    return {
+      status: true,
+      data: { user: createdUser, token },
+      message: "Register Success",
+    };
   } catch (err: unknown) {
-    return { status: false, data: {}, message: "Register Failed", error: String(err) };
+    return {
+      status: false,
+      data: {},
+      message: "Register Failed",
+      error: String(err),
+    };
   }
 }
