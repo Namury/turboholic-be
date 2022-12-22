@@ -22,8 +22,8 @@ export interface chartData{
 export interface summaryData{
   fuelType: string,
   fuelPrice: number,
-  fuelSavingsLiter: number|undefined,
-  fuelSavingRupiah: number|undefined,
+  fuelSavingsLiter: number|null,
+  fuelSavingRupiah: number|null,
 }
 
 export function round(value:number, precision?:number) {

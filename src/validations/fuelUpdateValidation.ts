@@ -52,15 +52,37 @@ export async function validateAddFuelUpdate(
     return response_bad_request(res, "Refuel Date is older than initial data");
   }
 
-  if (currentFuelUpdate && new Date(refuelDate) < currentFuelUpdate.createdAt) {
-    return response_bad_request(res, "Refuel Date is older than latest fuel update");
+  if (
+    currentFuelUpdate &&
+    new Date(refuelDate) < currentFuelUpdate.refuelDate
+  ) {
+    return response_bad_request(
+      res,
+      "Refuel Date is older than latest fuel update"
+    );
   }
 
   if (refuelAmount > currentVehicle.maxFuelCapacity)
-    return response_bad_request(res, "Refuel Amount is invalid");
+    return response_bad_request(
+      res,
+      "Refuel Amount is more than max fuel capacity"
+    );
 
   if (currentOdometer < currentVehicle.initialOdometer)
-    return response_bad_request(res, "Current Odometer is invalid");
+    return response_bad_request(
+      res,
+      "Current Odometer is less than initial data"
+    );
+
+  if (
+    currentFuelUpdate &&
+    currentOdometer <= currentFuelUpdate.currentOdometer
+  ) {
+    return response_bad_request(
+      res,
+      "Current Odometer is less or equal than latest fuel update"
+    );
+  }
 
   if (fuelGaugeAfter > currentVehicle.maxFuelGauge || fuelGaugeAfter < 0)
     return response_bad_request(res, "fuelGaugeAfter is invalid");

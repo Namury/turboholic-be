@@ -117,7 +117,7 @@ function getFuelUpdateChart(fuelUpdate: FuelUpdate[]) {
 
 export async function getFuelUpdateService(
   vehicleId: number,
-  fuelTypeId: number,
+  fuelTypeId?: number,
   dateStart?: string,
   dateEnd?: string
 ): Promise<response> {
@@ -144,7 +144,7 @@ export async function getFuelUpdateService(
     const fuelUpdate = await prisma.fuelUpdate.findMany({
       where: {
         vehicleId,
-        fuelTypeId,
+        fuelTypeId: fuelTypeId?fuelTypeId:undefined,
         refuelDate: dateFilter,
       },
       orderBy: {
@@ -152,20 +152,24 @@ export async function getFuelUpdateService(
       },
     });
 
-    const fuelType = await prisma.fuelType.findUnique({
-      where: {
-        id: fuelTypeId,
-      },
-    });
+    let fuelType
 
-    if (!fuelType) {
-      return {
-        status: false,
-        data: { fuelUpdate },
-        message: "fuelType is Invalid",
-        error: "",
-      };
+    if(fuelTypeId){
+      fuelType = await prisma.fuelType.findUnique({
+        where: {
+          id: fuelTypeId,
+        },
+      });
     }
+
+    // if (!fuelType) {
+    //   return {
+    //     status: false,
+    //     data: { fuelUpdate },
+    //     message: "fuelType is Invalid",
+    //     error: "",
+    //   };
+    // }
 
     const fuelUpdateChart = getFuelUpdateChart(fuelUpdate);
 
@@ -173,10 +177,10 @@ export async function getFuelUpdateService(
       status: true,
       data: {
         chartData: fuelUpdateChart.chartData,
-        fuelPrice: fuelType.price,
+        fuelPrice: fuelType?.price || null,
         currentFuelUsage: fuelUpdateChart.currentFuelUsage,
         totalDistance: fuelUpdateChart.totalDistance,
-        fuelSavingsData: calculateFuelSavings(fuelUpdate, fuelType.price),
+        fuelSavingsData: fuelType?.price ? calculateFuelSavings(fuelUpdate, fuelType.price) : null,
       },
       message: "Get Fuel Update Success",
     };
@@ -226,13 +230,13 @@ export async function getFuelUpdateSummaryService(
       };
     }
 
-    const fuelType = await prisma.fuelType.findMany({
+    const fuelTypes = await prisma.fuelType.findMany({
       where: {
         engineTypeId: currentVehicle.engineTypeId,
       },
     });
 
-    if (!fuelType) {
+    if (!fuelTypes) {
       return {
         status: false,
         data: { currentVehicle },
@@ -241,13 +245,13 @@ export async function getFuelUpdateSummaryService(
       };
     }
 
-    const returnData:summaryData[] = [];
+    const returnData: summaryData[] = [];
 
-    fuelType.forEach(async function (data) {
+    for (const fuelType of fuelTypes) {
       const fuelUpdate = await prisma.fuelUpdate.findMany({
         where: {
           vehicleId,
-          fuelTypeId: data.id,
+          fuelTypeId: fuelType.id,
           refuelDate: dateFilter,
         },
         orderBy: {
@@ -255,16 +259,15 @@ export async function getFuelUpdateSummaryService(
         },
         take: 3,
       });
-      const fuelSavings = calculateFuelSavings(fuelUpdate, data.price)
-      
-      returnData.push({
-        fuelType: data.name,
-        fuelPrice: data.price,
-        fuelSavingRupiah: fuelSavings?.fuelSavingRupiah,
-        fuelSavingsLiter: fuelSavings?.fuelSavingsLiter,
-      })
-    });
+      const fuelSavings = calculateFuelSavings(fuelUpdate, fuelType.price);
 
+      returnData.push({
+        fuelType: fuelType.name,
+        fuelPrice: fuelType.price,
+        fuelSavingRupiah: fuelSavings?.fuelSavingRupiah || null,
+        fuelSavingsLiter: fuelSavings?.fuelSavingsLiter || null,
+      });
+    }
 
     return {
       status: true,
@@ -280,6 +283,12 @@ export async function getFuelUpdateSummaryService(
     };
   }
 }
+
+// export async function getUserRankingService(vehicles:Vehicle[]){
+//   for (const vehicle of vehicles) {
+//     await getFuelUpdateSummaryService(vehicle.id)
+//   }
+// }
 
 export async function addFuelUpdateService(
   fuelUpdateData: addFuelUpdate
