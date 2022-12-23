@@ -257,7 +257,6 @@ export async function getFuelUpdateSummaryService(
         orderBy: {
           refuelDate: "asc",
         },
-        take: 3,
       });
       const fuelSavings = calculateFuelSavings(fuelUpdate, fuelType.price);
 

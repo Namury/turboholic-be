@@ -45,7 +45,7 @@ export async function userLoginService(
       return {
         status: true,
         message: "Login Success",
-        data: userDetails,
+        data: {rank: 5, ...userDetails},
       };
     } else {
       throw new Error("Incorrect");
