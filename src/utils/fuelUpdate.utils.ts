@@ -24,6 +24,8 @@ export interface summaryData{
   fuelPrice: number,
   fuelSavingsLiter: number|null,
   fuelSavingRupiah: number|null,
+  currentFuelUsage: number|null,
+  totalDistance: number,
 }
 
 export function round(value:number, precision?:number) {

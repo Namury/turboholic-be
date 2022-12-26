@@ -259,12 +259,15 @@ export async function getFuelUpdateSummaryService(
         },
       });
       const fuelSavings = calculateFuelSavings(fuelUpdate, fuelType.price);
+      const fuelUpdateChart = getFuelUpdateChart(fuelUpdate);
 
       returnData.push({
         fuelType: fuelType.name,
         fuelPrice: fuelType.price,
         fuelSavingRupiah: fuelSavings?.fuelSavingRupiah || null,
         fuelSavingsLiter: fuelSavings?.fuelSavingsLiter || null,
+        currentFuelUsage: fuelUpdateChart.currentFuelUsage||null,
+        totalDistance: fuelUpdateChart.totalDistance,
       });
     }
 
