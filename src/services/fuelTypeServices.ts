@@ -3,7 +3,11 @@ import { response } from "$utils/response.utils";
 
 export async function getFuelTypeService(): Promise<response> {
   try {
-    const fuelType = await prisma.fuelType.findMany();
+    const fuelType = await prisma.fuelType.findMany({
+      orderBy: {
+        price: "desc",
+      },
+    });
 
     return {
       status: true,
@@ -27,6 +31,9 @@ export async function getFuelTypeByEngineService(
     const fuelType = await prisma.fuelType.findMany({
       where: {
         engineTypeId,
+      },
+      orderBy: {
+        price: "desc",
       },
     });
 
