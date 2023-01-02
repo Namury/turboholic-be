@@ -37,6 +37,7 @@ function calculateFuelSavings(fuelUpdate: FuelUpdate[], fuelPrice: number) {
     - distance difference * km/liter difference = Liter Saved(?)
   */
 
+  // console.log("PRICE",fuelPrice)
   if (fuelUpdate.length < 3) {
     return null;
   }
@@ -68,8 +69,12 @@ function calculateFuelSavings(fuelUpdate: FuelUpdate[], fuelPrice: number) {
   const distanceDifference = fuelUsage2.distance;
   const fuelUsageDifference = fuelUsage1.fuelUsage - fuelUsage2.fuelUsage;
 
+  // console.log("Distance", distanceDifference)
+  // console.log("Fuel Usage difference", fuelUsageDifference)
+
   const fuelSavings = distanceDifference / fuelUsageDifference;
 
+  // console.log(fuelSavings)
   return {
     fuelSavingsLiter: round(fuelSavings, 1),
     fuelSavingRupiah: round(fuelSavings * fuelPrice),
@@ -171,6 +176,8 @@ export async function getFuelUpdateService(
     //   };
     // }
 
+    const latestFuelUpdateDate = fuelUpdate[fuelUpdate.length-1].refuelDate.toLocaleDateString('en-CA')
+
     const fuelUpdateChart = getFuelUpdateChart(fuelUpdate);
 
     return {
@@ -183,6 +190,7 @@ export async function getFuelUpdateService(
         fuelSavingsData: fuelType?.price
           ? calculateFuelSavings(fuelUpdate, fuelType.price)
           : null,
+        latestFuelUpdateDate
       },
       message: "Get Fuel Update Success",
     };
