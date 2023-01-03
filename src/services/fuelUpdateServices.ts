@@ -176,7 +176,8 @@ export async function getFuelUpdateService(
     //   };
     // }
 
-    const latestFuelUpdateDate = fuelUpdate[fuelUpdate.length-1].refuelDate.toLocaleDateString('en-CA')
+    const latestFuelUpdateDate =
+      fuelUpdate[fuelUpdate.length - 1].refuelDate.toLocaleDateString("en-CA");
 
     const fuelUpdateChart = getFuelUpdateChart(fuelUpdate);
 
@@ -190,7 +191,9 @@ export async function getFuelUpdateService(
         fuelSavingsData: fuelType?.price
           ? calculateFuelSavings(fuelUpdate, fuelType.price)
           : null,
-        latestFuelUpdateDate
+        latestFuelUpdateDate: latestFuelUpdateDate
+          ? latestFuelUpdateDate
+          : null,
       },
       message: "Get Fuel Update Success",
     };

@@ -13,7 +13,11 @@ const allowedOrigins = [
   "http://localhost:3001",
   "http://localhost:3000/",
   "https://turboholic.vercel.app/",
-  "https://turboholic.vercel.app"
+  "https://turboholic.vercel.app",
+  "https://api.turboholic.com/",
+  "https://api.turboholic.com",
+  "https://turboholic.com/",
+  "https://turboholic.com",
 ];
 
 const options: cors.CorsOptions = {

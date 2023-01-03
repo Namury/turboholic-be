@@ -2,11 +2,12 @@
   "name": "turboholic-be",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./src/app.ts",
+    "dev": "nodemon ./src/index.ts",
     "build": "tsc && tsc-alias",
-    "start": "node ./build/app.js"
+    "start": "node ./build/index.js",
+    "init=prisma": "npx prisma generate"
   },
   "repository": {
     "type": "git",
