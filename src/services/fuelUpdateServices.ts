@@ -176,8 +176,9 @@ export async function getFuelUpdateService(
     //   };
     // }
 
-    const latestFuelUpdateDate =
-      fuelUpdate[fuelUpdate.length - 1].refuelDate.toLocaleDateString("en-CA");
+    const latestFuelUpdateDate = fuelUpdate[fuelUpdate.length - 1]
+      ? fuelUpdate[fuelUpdate.length - 1].refuelDate.toLocaleDateString("en-CA")
+      : null;
 
     const fuelUpdateChart = getFuelUpdateChart(fuelUpdate);
 
