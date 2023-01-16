@@ -54,7 +54,7 @@ export async function validateAddFuelUpdate(
 
   if (
     currentFuelUpdate &&
-    new Date(refuelDate) < new Date((new Date(currentFuelUpdate.refuelDate)).valueOf() - 1000*60*60*24))
+    new Date(refuelDate) < new Date((new Date(currentFuelUpdate.refuelDate)).valueOf() - 1000*60*60*24)
   ) {
     return response_bad_request(
       res,
