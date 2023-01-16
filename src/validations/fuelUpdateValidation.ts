@@ -48,19 +48,19 @@ export async function validateAddFuelUpdate(
     },
   });
 
-//   if (new Date(refuelDate) < currentVehicle.createdAt) {
-//     return response_bad_request(res, "Refuel Date is older than initial data");
-//   }
+  if (new Date(refuelDate) < new Date((new Date(currentVehicle.createdAt)).valueOf() - 1000*60*60*24)) {
+    return response_bad_request(res, "Refuel Date is older than initial data");
+  }
 
-//   if (
-//     currentFuelUpdate &&
-//     new Date(refuelDate) < currentFuelUpdate.refuelDate
-//   ) {
-//     return response_bad_request(
-//       res,
-//       "Refuel Date is older than latest fuel update"
-//     );
-//   }
+  if (
+    currentFuelUpdate &&
+    new Date(refuelDate) < new Date((new Date(currentFuelUpdate.refuelDate)).valueOf() - 1000*60*60*24))
+  ) {
+    return response_bad_request(
+      res,
+      "Refuel Date is older than latest fuel update"
+    );
+  }
 
   if (refuelAmount > currentVehicle.maxFuelCapacity)
     return response_bad_request(
