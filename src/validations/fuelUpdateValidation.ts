@@ -48,17 +48,19 @@ export async function validateAddFuelUpdate(
     },
   });
 
+  //   "Refuel Date is older than initial data"
   if (new Date(refuelDate) < new Date((new Date(currentVehicle.createdAt)).valueOf() - 1000*60*60*24)) {
-    return response_bad_request(res, "Refuel Date is older than initial data");
+    return response_bad_request(res, "errorDate");
   }
 
+  //   "Refuel Date is older than latest fuel update"
   if (
     currentFuelUpdate &&
     new Date(refuelDate) < new Date((new Date(currentFuelUpdate.refuelDate)).valueOf() - 1000*60*60*24)
   ) {
     return response_bad_request(
       res,
-      "Refuel Date is older than latest fuel update"
+       "errorDate"
     );
   }
 
@@ -68,19 +70,22 @@ export async function validateAddFuelUpdate(
       "Refuel Amount is more than max fuel capacity"
     );
 
+  //    "Current Odometer is less than initial data" 
   if (currentOdometer < currentVehicle.initialOdometer)
     return response_bad_request(
       res,
-      "Current Odometer is less than initial data"
+     "errorOdo"
     );
 
+  
+  //   "Current Odometer is less or equal than latest fuel update"
   if (
     currentFuelUpdate &&
     currentOdometer <= currentFuelUpdate.currentOdometer
   ) {
     return response_bad_request(
       res,
-      "Current Odometer is less or equal than latest fuel update"
+      "errorOdo"
     );
   }
 
