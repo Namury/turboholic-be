@@ -13,7 +13,7 @@ datasource db {
 model User {
   id        Int         @unique @default(autoincrement())
   name      String
-  username  String?      @unique
+  username  String?     @unique
   email     String      @unique
   phone     String      @unique
   password  String
@@ -34,8 +34,8 @@ model Vehicle {
   initialFuelTypeId Int
   FuelType          FuelType    @relation(fields: [initialFuelTypeId], references: [id])
   maxFuelCapacity   Int
-  maxFuelGauge      Int
-  initialFuelGauge  Int
+  maxFuelGauge      Int?
+  initialFuelGauge  Int?
   initialOdometer   Int
   createdAt         DateTime    @default(now())
 
@@ -72,8 +72,8 @@ model FuelUpdate {
   Vehicle           Vehicle   @relation(fields: [vehicleId], references: [id])
   fuelTypeId        Int
   FuelType          FuelType  @relation(fields: [fuelTypeId], references: [id])
-  fuelGaugeBefore   Int
-  fuelGaugeAfter    Int
+  fuelGaugeBefore   Int?
+  fuelGaugeAfter    Int?
   refuelAmount      Int
   refuelDate        DateTime
   currentOdometer   Int
