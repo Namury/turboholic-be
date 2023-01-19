@@ -32,7 +32,6 @@ export async function userLoginService(
 
     const user = await prisma.user.findUnique({
       where: condition,
-      include: { Vehicle: true },
     });
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = createToken(user);

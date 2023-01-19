@@ -89,16 +89,16 @@ export async function validateAddFuelUpdate(
     );
   }
 
-  if (fuelGaugeAfter > currentVehicle.maxFuelGauge || fuelGaugeAfter < 0)
+  if (fuelGaugeAfter && currentVehicle.maxFuelGauge && (fuelGaugeAfter > currentVehicle.maxFuelGauge || fuelGaugeAfter < 0))
     return response_bad_request(res, "fuelGaugeAfter is invalid");
 
   if (
-    fuelGaugeBefore &&
+    fuelGaugeBefore && currentVehicle.maxFuelGauge &&
     (fuelGaugeBefore > currentVehicle.maxFuelGauge || fuelGaugeBefore < 0)
   )
     return response_bad_request(res, "fuelGaugeBefore is invalid");
 
-  if (fuelGaugeBefore > fuelGaugeAfter)
+  if (fuelGaugeAfter && (fuelGaugeBefore > fuelGaugeAfter))
     return response_bad_request(
       res,
       "fuelGaugeAfter and fuelGaugeBefore is invalid"
